@@ -22,6 +22,30 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
+
+// Very small in-memory token bucket per IP (resets when instance restarts)
+const buckets = new Map(); // ip -> { tokens, ts }
+const LIMIT = Number(process.env.SUBMIT_PER_MIN || 6); // 6/min/IP
+
+function allow(ip) {
+  const now = Date.now();
+  const b = buckets.get(ip) || { tokens: LIMIT, ts: now };
+  const elapsedMin = (now - b.ts) / 60000;
+  b.tokens = Math.min(LIMIT, b.tokens + elapsedMin * LIMIT);
+  b.ts = now;
+  if (b.tokens < 1) { buckets.set(ip, b); return false; }
+  b.tokens -= 1; buckets.set(ip, b); return true;
+}
+
+
+
+const ip = (req.headers["x-forwarded-for"] || "").split(",")[0] || req.ip || "na";
+if (!allow(ip)) return res.status(429).json({ status: "error", reason: "rate_limited" });
+
+
+
 // Require ?key= on /search and /submit
 app.use((req, res, next) => {
   // allow health checks
