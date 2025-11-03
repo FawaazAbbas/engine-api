@@ -178,6 +178,10 @@ app.post("/submit", async (req, res) => {
 /* ---------- health (optional) ---------- */
 app.get("/health", (req, res) => res.json({ ok: true }));
 
-/* ---------- start ---------- */
-const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`API running on ${port}`));
+
+// quick root route for debugging
+app.get("/", (req, res) => res.json({ ok: true, rev: process.env.K_REVISION || "local" }));
+
+// start
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => console.log(`API running on ${PORT}, rev=${process.env.K_REVISION || "local"}`));
