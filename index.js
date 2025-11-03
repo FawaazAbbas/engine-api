@@ -1,7 +1,7 @@
 import express from "express";
 import fetch   from "node-fetch";
 import bodyParser from "body-parser";
-import crypto  from "crypto";          // ← NEW
+import crypto  from "crypto";
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 });
 
 /* ---------- tiny token-bucket per IP for /submit ---------- */
-const buckets = new Map();                       // ip → { tokens, ts }
+const buckets = new Map(); // ip → { tokens, ts }
 function allow(ip){
   const now = Date.now();
   const b   = buckets.get(ip) || { tokens: SUBMIT_LIMIT, ts: now };
@@ -54,11 +54,15 @@ app.get("/search", async (req,res)=>{
   if (!q) return res.json({ results:[], message:"Provide q." });
 
   setCache(res);
-  const r = await fetch(`${MEILI_URL}/indexes/pages/search`,{
-    method:"POST",
-    headers: { "Authorization": `Bearer ${MEILI_KEY}`, "Content-Type": "application/json" }
+  const r = await fetch(`${MEILI_URL}/indexes/pages/search`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${MEILI_KEY}`,
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({ q, limit:Number(k) }),
   });
+
   const data = await r.json();
   const results = (data.hits||[]).map(h=>({
     url: h.url,
@@ -76,7 +80,7 @@ app.post("/submit", async (req,res)=>{
   const { url } = req.body || {};
   if (!url) return res.status(400).json({ status:"error", reason:"missing_url" });
 
-  // NEW – safe deterministic id
+  // deterministic id
   const id = crypto.createHash("sha1").update(url).digest("hex");
 
   const doc = {
@@ -89,14 +93,23 @@ app.post("/submit", async (req,res)=>{
     city: ""
   };
 
-  const r = await fetch(`${MEILI_URL}/indexes/pages/documents`,{
-    method:"POST",
-    headers:{ "X-Meili-API-Key":MEILI_KEY,"Content-Type":"application/json" },
+  const r = await fetch(`${MEILI_URL}/indexes/pages/documents`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${MEILI_KEY}`,
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify([doc])
   });
+
   if (!r.ok){
     const text = await r.text().catch(()=> "");
-    return res.status(500).json({ status:"error", reason:"index_failed", meili_status:r.status, meili_body:text });
+    return res.status(500).json({
+      status:"error",
+      reason:"index_failed",
+      meili_status:r.status,
+      meili_body:text
+    });
   }
   res.json({ status:"ok", url });
 });
