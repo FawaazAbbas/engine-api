@@ -121,6 +121,9 @@ app.post("/submit", async (req,res)=>{
   res.json({ status:"ok", url });
 });
 
-/* ---- start ---- */
+// --- start server for Cloud Run ---
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, ()=> console.log("API running on", PORT));
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅  Engine API running on port ${PORT}`);
+});
+
