@@ -19,6 +19,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Origin": ORIGIN,
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Vary": "Origin"
   });
   if (req.method === "OPTIONS") return res.status(204).end();
   next();
