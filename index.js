@@ -56,7 +56,7 @@ app.get("/search", async (req,res)=>{
   setCache(res);
   const r = await fetch(`${MEILI_URL}/indexes/pages/search`,{
     method:"POST",
-    headers:{ "X-Meili-API-Key":MEILI_KEY,"Content-Type":"application/json" },
+    headers: { "Authorization": `Bearer ${MEILI_KEY}`, "Content-Type": "application/json" }
     body: JSON.stringify({ q, limit:Number(k) }),
   });
   const data = await r.json();
