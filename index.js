@@ -159,4 +159,12 @@ app.post("/submit", async (req, res) => {
   }
 });
 
+// ---- Crawl endpoint ----
+app.post("/crawl", async (req, res) => {
+  const { seed, maxPages, maxDepth } = req.body || {};
+  if (!seed) return res.status(400).json({ status: "error", reason: "missing_seed" });
+  crawl(seed, { maxPages: Number(maxPages) || 10, maxDepth: Number(maxDepth) || 1 });
+  res.json({ status: "started", seed });
+});
+
 app.listen(8080, () => console.log("API running on 8080"));
