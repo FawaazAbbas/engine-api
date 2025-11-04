@@ -2,6 +2,8 @@ import express from "express";
 import fetch from "node-fetch";
 import bodyParser from "body-parser";
 import crypto from "crypto";
+import { crawl } from "./crawler.js";
+
 
 const app = express();
 app.use(express.static('.'));
