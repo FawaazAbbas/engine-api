@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import crypto from "crypto";
 
 const app = express();
+app.use(express.static('.'));
 app.use(bodyParser.json());
 
 // CORS
