@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import crypto from "crypto";
 import { URL } from "url";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 const MEILI_URL = process.env.MEILI_URL || "http://localhost:7700";
 const MEILI_KEY = process.env.MEILI_KEY || "supersecret";
